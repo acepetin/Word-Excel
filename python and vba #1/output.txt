@@ -1,0 +1,2 @@
+String             Multiplicative Shift     Bitmask   Simple MD5
+============================================================
