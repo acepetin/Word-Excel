@@ -1,87 +1,68 @@
-def read_data(filename):
+def read_input(filename):
     f = open(filename, 'r')
-    n_line = f.readline()
-    a_line = f.readline()
+    n = int(f.readline().strip())
+    data = f.readline().strip().split()
     f.close()
+    return n, to_linked_list(data)
 
-    # Получаем n
-    n = 0
-    i = 0
-    while i < len(n_line):
-        ch = n_line[i]
-        if ch >= '0' and ch <= '9':
-            n = n * 10 + (ord(ch) - ord('0'))
-        i += 1
-
-    # Получаем список чисел
-    a = []
-    i = 0
-    num = 0
-    negative = False
-    in_number = False
-    while i <= len(a_line):
-        if i < len(a_line):
-            ch = a_line[i]
-        else:
-            ch = ' '  # искусственно завершаем последнее число
-
-        if ch == '-':
-            negative = True
-        elif ch >= '0' and ch <= '9':
-            num = num * 10 + (ord(ch) - ord('0'))
-            in_number = True
-        elif ch == ' ' or ch == '\n':
-            if in_number:
-                if negative:
-                    num = -num
-                # вставляем вручную без append
-                a_len = 0
-                while a_len < 10000:
-                    if a_len == len(a):
-                        break
-                    a_len += 1
-                a += [0]
-                a[a_len] = num
-                num = 0
-                negative = False
-                in_number = False
-        i += 1
-
-    return n, a
-
-def write_data(filename, a):
+def write_output(filename, head):
     f = open(filename, 'w')
-    i = 0
-    while i < len(a):
-        f.write(str(a[i]))
-        if i != len(a) - 1:
-            f.write(' ')
-        i += 1
-    f.write('\n')
+    curr = head
+    while curr is not None:
+        f.write(curr[0] + ' ')
+        curr = curr[1]
     f.close()
 
-def swap_edges(n, a):
-    length = 0
-    i = 0
-    while i < 100000:
-        if i == len(a):
-            break
-        length += 1
-        i += 1
+def to_linked_list(values):
+    if len(values) == 0:
+        return None
+    head = [values[0], None]
+    current = head
+    i = 1
+    while i < len(values):
+        node = [values[i], None]
+        current[1] = node
+        current = node
+        i = i + 1
+    return head
 
-    if 2 * n > length:
-        return a
+def get_length(head):
+    count = 0
+    current = head
+    while current is not None:
+        count = count + 1
+        current = current[1]
+    return count
+
+def get_node_at(head, index):
+    current = head
+    i = 0
+    while i < index and current is not None:
+        current = current[1]
+        i = i + 1
+    return current
+
+def swap_nodes_values(node1, node2):
+    temp = node1[0]
+    node1[0] = node2[0]
+    node2[0] = temp
+
+def swap_first_last_n(head, n):
+    length = get_length(head)
+    if n <= 0 or n * 2 > length:
+        return head
 
     i = 0
     while i < n:
-        t = a[i]
-        a[i] = a[length - n + i]
-        a[length - n + i] = t
-        i += 1
+        node_start = get_node_at(head, i)
+        node_end = get_node_at(head, length - n + i)
+        swap_nodes_values(node_start, node_end)
+        i = i + 1
+    return head
 
-    return a
+def main():
+    n, head = read_input('input.txt')
+    head = swap_first_last_n(head, n)
+    write_output('output.txt', head)
 
-# Основная программа
-n, a = read_data('input.txt')
-a = swap_edges(n, a)
-write_data('output.txt', a)
+main()
